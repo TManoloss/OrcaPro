@@ -19,8 +19,8 @@ jobs:
           POSTGRES_DB: test_db
         ports:
           - 5432:5432
-        options: >-
-          --health-cmd pg_isready -U postgres
+        options: 
+          --health-cmd "pg_isready -U postgres"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -29,7 +29,7 @@ jobs:
         image: redis:7-alpine
         ports:
           - 6379:6379
-        options: >-
+        options: 
           --health-cmd "redis-cli ping"
           --health-interval 10s
           --health-timeout 5s
@@ -43,7 +43,7 @@ jobs:
         ports:
           - 5672:5672
           - 15672:15672
-        options: >-
+        options: 
           --health-cmd "rabbitmq-diagnostics -q ping"
           --health-interval 10s
           --health-timeout 5s
@@ -52,11 +52,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-
-    # Iniciar serviços Docker Compose adicionais
-    - name: Start Docker Compose services
-      run: |
-        docker-compose up -d
 
     # Verificar conexão com PostgreSQL
     - name: Check PostgreSQL connection
@@ -67,7 +62,6 @@ jobs:
     - name: Build Node.js backend
       working-directory: ./backend
       run: |
-        # Criar package.json mínimo se não existir
         if [ ! -f package.json ]; then
           echo '{
             "name": "backend",
@@ -85,7 +79,6 @@ jobs:
     - name: Build Node.js frontend
       working-directory: ./frontend-web
       run: |
-        # Criar package.json mínimo se não existir
         if [ ! -f package.json ]; then
           echo '{
             "name": "frontend-web",
