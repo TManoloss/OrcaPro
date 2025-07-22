@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     container_name: budget_postgres
     environment:
       POSTGRES_USER: postgres
@@ -55,6 +55,28 @@ services:
     networks:
       - budget_network
 
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth_service
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/budget_db?currentSchema=auth_schema
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      JWT_SECRET_KEY: myverysecretkey123!  # Adicione sua chave JWT
+      SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA: auth_schema
+      SPRING_SQL_INIT_MODE: always
+      # Spring Boot vai criar schema automaticamente
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - budget_network
+
 volumes:
   postgres_data:
   redis_data:
@@ -63,3 +85,6 @@ volumes:
 networks:
   budget_network:
     driver: bridge
+
+
+  
