@@ -1,0 +1,137 @@
+═══════════════════════════════════════════════════════════════
+  COMANDOS PARA RODAR O ORCAPRO - COPIE E COLE
+═══════════════════════════════════════════════════════════════
+
+📁 DIRETÓRIO BASE:
+cd /home/manoelfelip/Documentos/projetos/OrcaPro
+
+═══════════════════════════════════════════════════════════════
+  OPÇÃO 1: INÍCIO RÁPIDO (RECOMENDADO)
+═══════════════════════════════════════════════════════════════
+
+1️⃣ PREPARAR TUDO:
+./start-all.sh
+
+2️⃣ INICIAR SERVIÇOS (3 terminais):
+
+Terminal 1:
+./start-auth-service.sh
+
+Terminal 2:
+./start-transaction-service.sh
+
+Terminal 3:
+./start-ai-service.sh
+
+3️⃣ TESTAR:
+./test-with-ai.sh
+
+═══════════════════════════════════════════════════════════════
+  OPÇÃO 2: PASSO A PASSO MANUAL
+═══════════════════════════════════════════════════════════════
+
+1️⃣ INICIAR INFRAESTRUTURA:
+sudo docker-compose up -d postgres redis rabbitmq jaeger
+
+2️⃣ AGUARDAR (10 segundos):
+sleep 10
+
+3️⃣ INICIALIZAR BANCO (primeira vez):
+sudo docker exec -i postgres psql -U admin -d app_database < init-scripts/postgres/001_init.sql
+
+4️⃣ COMPILAR SERVIÇOS:
+cd services/auth-service && go build -o auth-service . && cd ../..
+cd services/trasaction-service && go build -o transaction-service . && cd ../..
+
+5️⃣ CRIAR ARQUIVOS .ENV:
+cp services/auth-service/.env.example services/auth-service/.env
+cp services/trasaction-service/.env.example services/trasaction-service/.env
+cp services/ai-service/.env.example services/ai-service/.env
+
+6️⃣ INICIAR AUTH SERVICE (Terminal 1):
+cd services/auth-service
+export $(cat .env | grep -v '^#' | xargs)
+./auth-service
+
+7️⃣ INICIAR TRANSACTION SERVICE (Terminal 2):
+cd services/trasaction-service
+export $(cat .env | grep -v '^#' | xargs)
+./transaction-service
+
+8️⃣ INICIAR AI SERVICE (Terminal 3):
+cd services/ai-service
+pip install -r requirements.txt
+export $(cat .env | grep -v '^#' | xargs)
+python3 main.py
+
+═══════════════════════════════════════════════════════════════
+  VERIFICAR SE ESTÁ FUNCIONANDO
+═══════════════════════════════════════════════════════════════
+
+curl http://localhost:8001/health
+curl http://localhost:8002/health
+curl http://localhost:8003 | grep ml_model_loaded
+
+═══════════════════════════════════════════════════════════════
+  TESTAR SISTEMA COMPLETO
+═══════════════════════════════════════════════════════════════
+
+./test-with-ai.sh
+
+Ou teste manual:
+
+# Login
+TOKEN=$(curl -s -X POST http://localhost:8001/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"teste-ia@example.com","password":"senha12345"}' \
+  | grep -o '"access_token":"[^"]*' | cut -d'"' -f4)
+
+# Criar transação
+curl -X POST http://localhost:8002/api/v1/transactions \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"description":"Uber para casa","amount":35.00,"category":"Outros","type":"expense","date":"2025-10-18T18:00:00Z"}'
+
+# Ver categorização
+sudo docker logs ai-service --tail 5
+
+═══════════════════════════════════════════════════════════════
+  PARAR TUDO
+═══════════════════════════════════════════════════════════════
+
+# Parar serviços (Ctrl+C em cada terminal)
+
+# Parar infraestrutura
+sudo docker-compose down
+
+═══════════════════════════════════════════════════════════════
+  URLS IMPORTANTES
+═══════════════════════════════════════════════════════════════
+
+Auth Service:        http://localhost:8001
+Transaction Service: http://localhost:8002
+AI Service:          http://localhost:8003
+RabbitMQ Management: http://localhost:15672 (admin/admin123)
+Jaeger UI:           http://localhost:16686
+
+═══════════════════════════════════════════════════════════════
+  TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════
+
+# Ver logs
+sudo docker logs postgres
+sudo docker logs redis
+sudo docker logs rabbitmq
+sudo docker logs ai-service
+
+# Verificar portas
+sudo lsof -i :8001
+sudo lsof -i :8002
+sudo lsof -i :8003
+
+# Reiniciar tudo
+sudo docker-compose restart
+pkill -f auth-service
+pkill -f transaction-service
+
+═══════════════════════════════════════════════════════════════

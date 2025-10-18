@@ -1,0 +1,91 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'microservices-monitor'
+    environment: 'development'
+
+# Alertmanager configuration (opcional para produção)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Regras de alerta (pode ser expandido)
+rule_files:
+  # - "alerts/*.yml"
+
+# Configuração de scrape
+scrape_configs:
+  # Prometheus se auto-monitora
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+
+  # PostgreSQL Exporter (adicionar quando implementar)
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+        labels:
+          service: 'postgres'
+    # Comentado até adicionar o exporter
+    # scrape_interval: 30s
+
+  # Redis Exporter (adicionar quando implementar)
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+        labels:
+          service: 'redis'
+    # Comentado até adicionar o exporter
+
+  # RabbitMQ (tem métricas nativas)
+  - job_name: 'rabbitmq'
+    static_configs:
+      - targets: ['rabbitmq:15692']
+        labels:
+          service: 'rabbitmq'
+
+  # Seus microsserviços vão aqui
+  # Exemplo de como adicionar seus serviços:
+  - job_name: 'auth-service'
+    static_configs:
+      - targets: ['auth-service:8001']
+        labels:
+          service: 'auth-service'
+          tier: 'backend'
+    scrape_interval: 15s
+
+  - job_name: 'transaction-service'
+    static_configs:
+      - targets: ['transaction-service:8002']
+        labels:
+          service: 'transaction-service'
+          tier: 'backend'
+    scrape_interval: 15s
+
+  - job_name: 'ai-service'
+    static_configs:
+      - targets: ['ai-service:8003']
+        labels:
+          service: 'ai-service'
+          tier: 'ml'
+    scrape_interval: 15s
+
+  # Docker metrics (requer cAdvisor)
+  - job_name: 'docker'
+    static_configs:
+      - targets: ['cadvisor:8080']
+        labels:
+          service: 'docker'
+    # Comentado até adicionar cAdvisor
+
+  # Node Exporter para métricas do host (opcional)
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node-exporter:9100']
+        labels:
+          service: 'node-exporter'
+    # Comentado até adicionar node-exporter

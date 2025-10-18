@@ -1,0 +1,80 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  # Coleta logs de todos os containers Docker
+  - job_name: docker
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+        filters:
+          - name: label
+            values: ["logging=promtail"]
+    relabel_configs:
+      # Extrai o nome do container
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/(.*)'
+        target_label: 'container'
+      
+      # Extrai o nome do serviço do compose
+      - source_labels: ['__meta_docker_container_label_com_docker_compose_service']
+        target_label: 'service'
+      
+      # Extrai o projeto do compose
+      - source_labels: ['__meta_docker_container_label_com_docker_compose_project']
+        target_label: 'project'
+      
+      # Extrai labels customizados
+      - source_labels: ['__meta_docker_container_label_app']
+        target_label: 'app'
+      
+      - source_labels: ['__meta_docker_container_label_environment']
+        target_label: 'environment'
+
+  # Coleta logs do sistema (opcional)
+  - job_name: system
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: varlogs
+          host: localhost
+          __path__: /var/log/*.log
+
+  # Pipeline para processar logs JSON (comum em aplicações modernas)
+  - job_name: json-logs
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+    relabel_configs:
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/(.*)'
+        target_label: 'container'
+      - source_labels: ['__meta_docker_container_label_com_docker_compose_service']
+        target_label: 'service'
+    pipeline_stages:
+      # Tenta fazer parse de logs JSON
+      - json:
+          expressions:
+            level: level
+            message: message
+            timestamp: timestamp
+            trace_id: trace_id
+            span_id: span_id
+      # Extrai o nível de log como label
+      - labels:
+          level:
+      # Define o timestamp do log
+      - timestamp:
+          source: timestamp
+          format: RFC3339Nano
+      # Formata a saída
+      - output:
+          source: message
