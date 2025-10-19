@@ -1,320 +1,557 @@
-# 🐋 OrcaPro - Sistema de Gerenciamento Financeiro com IA
+# 🚀 Projeto Completo: Microsserviços com IA e Observabilidade
 
-Sistema completo de gerenciamento financeiro com **microsserviços**, **Machine Learning** para categorização automática e **observabilidade completa**.
+Sistema completo de gestão financeira usando arquitetura de microsserviços, Machine Learning e observabilidade de nível produção.
 
----
+## 📋 O Que Foi Construído
 
-## ⚡ Início Rápido
+### 🏗️ Fase 0: Infraestrutura Base
+- **Bancos de Dados**: PostgreSQL + Redis
+- **Mensageria**: RabbitMQ com Management UI
+- **Observabilidade**: Prometheus + Grafana + Jaeger + Loki + Promtail
+- **Ferramentas**: Adminer (PostgreSQL UI) + Redis Commander
 
-### 🐳 Opção 1: Docker (Recomendado)
+### ⚙️ Fase 1: Microsserviços Core (Go)
+- **Auth Service (8001)**: Autenticação JWT completa
+- **Transaction Service (8002)**: CRUD de transações + Event publishing
 
-**Rode tudo com 1 comando:**
+### 🤖 Fase 2: Inteligência e Reatividade
+- **AI Service (8003)** - Python: Categorização automática com ML
+- **Notification Service (8004)** - Node.js: Alertas inteligentes
+
+## 🎯 Arquitetura Completa
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                   OBSERVABILIDADE                        │
+│   Grafana │ Prometheus │ Jaeger │ Loki │ Promtail      │
+└─────────────────────────────────────────────────────────┘
+                         ▲
+                         │ métricas/logs/traces
+                         │
+┌─────────────────────────────────────────────────────────┐
+│                   MICROSSERVIÇOS                         │
+│                                                          │
+│  Auth ──→ Transaction ──→ RabbitMQ ──┬──→ AI Service   │
+│ (Go)       (Go)          Exchange    │    (Python)      │
+│  8001       8002                     │     8003         │
+│                                      │                   │
+│                                      └──→ Notification  │
+│                                           (Node.js)      │
+│                                            8004          │
+└─────────────────────────────────────────────────────────┘
+         │              │
+         ▼              ▼
+    PostgreSQL      Redis
+```# 🚀 Infraestrutura de Desenvolvimento - Microsserviços com Observabilidade
+
+Projeto completo de microsserviços em Go com infraestrutura de produção local, observabilidade total e mensageria assíncrona.
+
+## 📋 O Que Foi Construído
+
+### 🏗️ Fase 0: Infraestrutura Base
+- **Bancos de Dados**: PostgreSQL + Redis
+- **Mensageria**: RabbitMQ com Management UI
+- **Observabilidade**: Prometheus + Grafana + Jaeger + Loki + Promtail
+- **Ferramentas**: Adminer (PostgreSQL UI) + Redis Commander
+
+### ⚙️ Fase 1: Microsserviços Core
+- **Auth Service**: Autenticação completa com JWT, registro, login, refresh tokens
+- **Transaction Service**: CRUD de transações com publicação de eventos no RabbitMQ
+- **Observabilidade Completa**: Logs estruturados, métricas Prometheus, tracing distribuído
+
+## 🎯 Arquitetura
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     OBSERVABILIDADE                          │
+│  Grafana │ Prometheus │ Jaeger │ Loki │ Promtail           │
+└─────────────────────────────────────────────────────────────┘
+                            ▲
+                            │ métricas/logs/traces
+                            │
+┌─────────────────────────────────────────────────────────────┐
+│                      MICROSSERVIÇOS                          │
+│                                                               │
+│  ┌─────────────┐         ┌──────────────────┐              │
+│  │Auth Service │         │Transaction Service│              │
+│  │   (8001)    │         │      (8002)       │              │
+│  └──────┬──────┘         └────────┬──────────┘              │
+│         │                          │                         │
+│         └──────────┬───────────────┘                         │
+│                    │                                         │
+└────────────────────┼─────────────────────────────────────────┘
+                     │
+         ┌───────────┴───────────┐
+         ▼                       ▼
+    ┌─────────┐            ┌──────────┐
+    │PostgreSQL│            │RabbitMQ  │
+    │  Redis  │            │(Events)  │
+    └─────────┘            └──────────┘
+```
+
+## 🚀 Quick Start
 
 ```bash
-cd /home/manoelfelip/Documentos/projetos/OrcaPro
-./scripts/start-docker.sh
+# 1. Clone e configure
+git clone <seu-repo>
+cd <seu-repo>
+make init
+
+# 2. Inicie tudo
+make up
+
+# 3. Verifique a saúde
+make health
+
+# 4. Teste o fluxo completo
+chmod +x test-flow.sh
+./test-flow.sh
 ```
 
-Aguarde ~15 segundos e teste:
+## 🔗 URLs de Acesso
+
+| Serviço | URL | Credenciais |
+|---------|-----|-------------|
+| **Auth Service** | http://localhost:8001 | - |
+| **Transaction Service** | http://localhost:8002 | - |
+| **Grafana** | http://localhost:3000 | admin / admin123 |
+| **Prometheus** | http://localhost:9090 | - |
+| **Jaeger UI** | http://localhost:16686 | - |
+| **RabbitMQ Management** | http://localhost:15672 | admin / admin123 |
+| **Adminer (PostgreSQL)** | http://localhost:8080 | admin / admin123 |
+| **Redis Commander** | http://localhost:8081 | - |
+
+## 📖 Documentação Detalhada
+
+- **[FASE1_README.md](FASE1_README.md)**: Guia completo da Fase 1 com exemplos de API, queries de observabilidade e troubleshooting
+
+## 🎓 Features Implementadas
+
+### Observabilidade de Produção
+✅ **Logging Estruturado**: JSON logs com Zap para fácil parsing  
+✅ **Métricas Custom**: Prometheus com métricas de negócio e técnicas  
+✅ **Distributed Tracing**: Jaeger com propagação de trace_id  
+✅ **Log Aggregation**: Loki + Promtail para busca centralizada  
+✅ **Dashboards**: Grafana com datasources pré-configurados  
+
+### Microsserviços Desacoplados
+✅ **Event-Driven**: Comunicação assíncrona via RabbitMQ  
+✅ **Trace Propagation**: trace_id mantido em eventos  
+✅ **Health Checks**: Endpoints /health em todos os serviços  
+✅ **Graceful Shutdown**: Timeout de 30s para finalizar requests  
+
+### Segurança
+✅ **JWT Authentication**: Access + Refresh tokens  
+✅ **Password Hashing**: bcrypt com salt  
+✅ **Token Blacklist**: Redis para logout  
+✅ **CORS configurado**: Headers permitidos  
+
+### Database
+✅ **Migrations**: SQL scripts automáticos  
+✅ **Indexes**: Otimizados para queries comuns  
+✅ **Triggers**: Auto-update de timestamps  
+✅ **Relations**: Foreign keys com CASCADE  
+
+## 📊 Métricas Disponíveis
+
+Veja no [FASE1_README.md](FASE1_README.md) a lista completa de métricas e como usá-las.
+
+**Exemplos:**
+- `user_registrations_total`: Usuários cadastrados
+- `transactions_created_total{type="expense"}`: Despesas criadas  
+- `http_request_duration_seconds`: Latência das APIs
+- `rabbitmq_messages_published_total`: Eventos publicados
+
+## 🧪 Testando
 
 ```bash
-./scripts/test-with-ai.sh
-```
+# Teste manual completo
+./test-flow.sh
 
-**Pronto!** Todos os serviços estão rodando em containers.
-
-📚 **[Ver guia completo Docker →](docs/guides/DOCKER_GUIDE.md)**
-
----
-
-### 💻 Opção 2: Local (Sem Docker)
-
-```bash
-# 1. Preparar infraestrutura
-./scripts/start-all.sh
-
-# 2. Iniciar serviços (3 terminais)
-./scripts/start-auth-service.sh        # Terminal 1
-./scripts/start-transaction-service.sh # Terminal 2
-./scripts/start-ai-service.sh          # Terminal 3
-
-# 3. Testar
-./scripts/test-with-ai.sh
-```
-
-📚 **[Ver guia completo local →](docs/guides/GUIA_EXECUCAO.md)**
-
----
-
-## ✨ Features
-
-- 🔐 **Autenticação JWT** com refresh tokens
-- 💰 **CRUD de Transações** completo
-- 🤖 **IA para Categorização Automática** (85-90% acurácia)
-- 📊 **Observabilidade Completa** (Prometheus, Grafana, Jaeger, Loki)
-- 🐰 **Mensageria Assíncrona** com RabbitMQ
-- 🔄 **Arquitetura de Microsserviços**
-- 🐳 **100% Containerizado** com Docker Compose
-
----
-
-## 🏗️ Arquitetura
-
-```
-┌─────────────┐
-│   Cliente   │
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐     ┌──────────────┐
-│Auth Service │────▶│ PostgreSQL   │
-│  (Go:8001)  │     │ Redis        │
-└──────┬──────┘     └──────────────┘
-       │
-       ▼
-┌──────────────┐    ┌──────────────┐
-│Transaction   │───▶│  RabbitMQ    │
-│Service       │    └──────┬───────┘
-│(Go:8002)     │           │
-└──────────────┘           ▼
-                    ┌──────────────┐
-                    │  AI Service  │
-                    │(Python:8003) │
-                    │  ML Model    │
-                    └──────────────┘
-```
-
----
-
-## 🎯 Serviços
-
-| Serviço | Porta | Status | Descrição |
-|---------|-------|--------|-----------|
-| **Auth Service** | 8001 | ✅ | Autenticação JWT |
-| **Transaction Service** | 8002 | ✅ | Gestão de transações |
-| **AI Service** | 8003 | ✅ | Categorização com ML |
-| **PostgreSQL** | 5432 | ✅ | Banco de dados |
-| **Redis** | 6379 | ✅ | Cache e sessões |
-| **RabbitMQ** | 5672, 15672 | ✅ | Mensageria |
-| **Prometheus** | 9090 | ✅ | Métricas |
-| **Grafana** | 3000 | ✅ | Dashboards |
-| **Jaeger** | 16686 | ✅ | Tracing distribuído |
-| **Adminer** | 8080 | ✅ | Interface PostgreSQL |
-| **Redis Commander** | 8081 | ✅ | Interface Redis |
-
----
-
-## 🤖 IA - Categorização Automática
-
-O AI Service usa **Machine Learning** (TF-IDF + Naive Bayes) para categorizar transações automaticamente em **11 categorias**:
-
-- 🍔 Alimentação
-- 🚗 Transporte
-- 🏠 Moradia
-- 💊 Saúde
-- 📚 Educação
-- 🎮 Lazer
-- 🛍️ Compras
-- 🔧 Serviços
-- 💰 Investimentos
-- 💵 Salário
-- 📦 Outros
-
-**Exemplos de categorização:**
-- "Uber para casa" → **Transporte** (76% confiança)
-- "Jantar no restaurante" → **Alimentação** (91% confiança)
-- "Netflix" → **Lazer** (75% confiança)
-
----
-
-## 🌐 URLs e Acessos
-
-| Interface | URL | Credenciais |
-|-----------|-----|-------------|
-| Auth Service | http://localhost:8001 | - |
-| Transaction Service | http://localhost:8002 | - |
-| AI Service | http://localhost:8003 | - |
-| RabbitMQ Management | http://localhost:15672 | admin/admin123 |
-| Grafana | http://localhost:3000 | admin/admin123 |
-| Prometheus | http://localhost:9090 | - |
-| Jaeger UI | http://localhost:16686 | - |
-| Adminer (PostgreSQL) | http://localhost:8080 | admin/admin123 |
-| Redis Commander | http://localhost:8081 | - |
-
----
-
-## 🧪 Testes
-
-### Teste Completo
-```bash
-./test-with-ai.sh
-```
-
-### Teste de Categorização
-```bash
-./test-ai-categorization.sh
-```
-
-### Teste Manual
-```bash
-# Login
-TOKEN=$(curl -s -X POST http://localhost:8001/api/v1/auth/login \
+# Teste individual - Registro
+curl -X POST http://localhost:8001/api/v1/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"email":"teste@example.com","password":"senha12345"}' \
-  | grep -o '"access_token":"[^"]*' | cut -d'"' -f4)
+  -d '{"email":"test@example.com","password":"senha123","name":"Test"}'
 
-# Criar transação
-curl -X POST http://localhost:8002/api/v1/transactions \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"description":"Uber","amount":35.00,"category":"Outros","type":"expense","date":"2025-10-18T18:00:00Z"}'
-
-# Ver categorização
-sudo docker logs ai-service --tail 5
+# Métricas
+curl http://localhost:8001/metrics
+curl http://localhost:8002/metrics
 ```
 
----
+## 🛠️ Comandos Make
 
-## 🛠️ Tecnologias
-
-- **Backend:** Go 1.21, Python 3.11
-- **ML:** scikit-learn, TF-IDF, Naive Bayes
-- **Banco:** PostgreSQL 15, Redis 7
-- **Mensageria:** RabbitMQ 3
-- **Observabilidade:** Prometheus, Grafana, Jaeger, Loki
-- **DevOps:** Docker, Docker Compose
-
----
-
-## 📚 Documentação
-
-### Guias de Uso
-- **[DOCKER_GUIDE.md](docs/guides/DOCKER_GUIDE.md)** - Guia completo Docker
-- **[GUIA_EXECUCAO.md](docs/guides/GUIA_EXECUCAO.md)** - Guia execução local
-- **[INICIO_RAPIDO.md](docs/guides/INICIO_RAPIDO.md)** - Início rápido
-- **[COMANDOS.txt](docs/guides/COMANDOS.txt)** - Comandos rápidos
-
-### Documentação Técnica
-- **[PROJETO_COMPLETO.md](docs/PROJETO_COMPLETO.md)** - Arquitetura completa
-- **[AI_SERVICE_COMPLETO.md](docs/AI_SERVICE_COMPLETO.md)** - Documentação IA
-- **[DOCUMENTATION_INDEX.md](docs/DOCUMENTATION_INDEX.md)** - Índice completo
-
-### Testes
-- **[TESTES_FINAIS.md](docs/tests/TESTES_FINAIS.md)** - Resultados dos testes
-
----
-
-## 🚀 Comandos Rápidos
-
-### Docker
 ```bash
-./scripts/start-docker.sh    # Iniciar tudo
-./scripts/stop-docker.sh     # Parar tudo
-./scripts/logs-docker.sh     # Ver logs
+make help          # Lista todos os comandos
+make up            # Inicia todos os serviços
+make down          # Para todos os serviços
+make health        # Verifica saúde dos serviços
+make logs          # Logs de todos os serviços
+make logs-auth-service        # Logs de um serviço específico
+make dev           # Modo desenvolvimento (up + logs)
+make clean         # Remove tudo (incluindo volumes)
+make rebuild       # Reconstrói as imagens Docker
+make backup        # Backup dos volumes do PostgreSQL
 ```
 
-### Local
+## 🔧 Configuração
+
+### Variáveis de Ambiente
+
+Copie o arquivo `.env.example` para `.env` e ajuste conforme necessário:
+
 ```bash
-./scripts/start-all.sh                # Preparar
-./scripts/start-auth-service.sh       # Auth
-./scripts/start-transaction-service.sh # Transaction
-./scripts/start-ai-service.sh         # AI
+cp .env.example .env
 ```
 
-### Testes
-```bash
-./scripts/test-with-ai.sh            # Teste completo
-./scripts/test-ai-categorization.sh  # Teste IA
+**⚠️ IMPORTANTE**: Em produção, altere todas as senhas e secrets!
+
+### Estrutura de Diretórios Completa
+
 ```
+projeto/
+├── docker-compose.yml           # Orquestração de toda infraestrutura
+├── Makefile                     # Comandos úteis
+├── .env.example                 # Template de variáveis
+├── .gitignore                   # Arquivos ignorados
+├── README.md                    # Este arquivo
+├── FASE1_README.md             # Documentação detalhada
+├── test-flow.sh                # Script de teste
+│
+├── config/                     # Configurações da infraestrutura
+│   ├── prometheus/
+│   │   └── prometheus.yml      # Targets e scrape configs
+│   ├── grafana/
+│   │   └── provisioning/
+│   │       └── datasources/
+│   │           └── datasources.yml  # Datasources pré-configurados
+│   ├── loki/
+│   │   └── loki-config.yml     # Configuração do Loki
+│   └── promtail/
+│       └── promtail-config.yml # Coleta de logs
+│
+├── init-scripts/               # Scripts de inicialização
+│   └── postgres/
+│       └── 001_init.sql        # Schema do banco
+│
+└── services/                   # Microsserviços
+    ├── auth-service/
+    │   ├── Dockerfile
+    │   ├── go.mod
+    │   ├── main.go
+    │   ├── config/
+    │   │   └── config.go
+    │   ├── handlers/
+    │   │   └── auth_handler.go
+    │   ├── middleware/
+    │   │   └── observability.go
+    │   ├── metrics/
+    │   │   └── metrics.go
+    │   ├── models/
+    │   │   └── user.go
+    │   └── repository/
+    │       └── user_repository.go
+    │
+    └── transaction-service/
+        ├── Dockerfile
+        ├── go.mod
+        ├── main.go
+        ├── config/
+        │   └── config.go
+        ├── handlers/
+        │   └── transaction_handler.go
+        ├── messaging/
+        │   └── publisher.go
+        ├── metrics/
+        │   └── metrics.go
+        ├── models/
+        │   └── transaction.go
+        └── repository/
+            └── transaction_repository.go
+```
+
+## 🔍 Observabilidade em Ação
+
+### Ver logs em tempo real com trace_id
+```bash
+# No Grafana → Explore → Loki
+{service="transaction-service"} | json | trace_id="abc123..."
+```
+
+### Queries Prometheus úteis
+```promql
+# Taxa de requisições por segundo
+rate(http_requests_total[5m])
+
+# P95 de latência
+histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))
+
+# Erros no RabbitMQ
+rate(rabbitmq_messages_publish_errors_total[5m])
+```
+
+### Rastrear uma requisição no Jaeger
+1. Faça uma request e pegue o X-Trace-ID do header
+2. Acesse Jaeger UI
+3. Busque pelo trace_id
+4. Veja o fluxo completo: API → DB → RabbitMQ
+
+## 🐛 Troubleshooting
+
+### Serviços não sobem
+```bash
+# Verificar logs
+make logs
+
+# Verificar recursos
+docker stats
+
+# Limpar e reiniciar
+make clean
+make up
+```
+
+### Erro de conexão com PostgreSQL
+```bash
+# Verificar se está healthy
+docker-compose ps postgres
+
+# Testar conexão
+docker-compose exec postgres psql -U admin -d app_database -c "\dt"
+
+# Ver logs
+make logs-postgres
+```
+
+### RabbitMQ não recebe mensagens
+```bash
+# Verificar exchange
+# http://localhost:15672 → Exchanges → transactions_exchange
+
+# Ver logs
+make logs-rabbitmq
+
+# Verificar filas
+make logs-transaction-service | grep "published"
+```
+
+### Prometheus não coleta métricas
+```bash
+# Verificar targets
+# http://localhost:9090/targets
+
+# Testar endpoint /metrics
+curl http://localhost:8001/metrics
+curl http://localhost:8002/metrics
+
+# Ver logs do Prometheus
+make logs-prometheus
+```
+
+## 📈 Monitoramento de Produção
+
+### Dashboards Recomendados para Importar no Grafana
+
+1. **Go Metrics** (ID: 10826)
+2. **PostgreSQL** (ID: 9628)
+3. **Redis** (ID: 11835)
+4. **RabbitMQ** (ID: 10991)
+5. **Node Exporter** (ID: 1860)
+
+### Alertas Importantes (configurar no Prometheus)
+
+```yaml
+# Alta taxa de erros
+- alert: HighErrorRate
+  expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.05
+  
+# Latência alta
+- alert: HighLatency
+  expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1
+
+# RabbitMQ com problemas
+- alert: RabbitMQPublishErrors
+  expr: rate(rabbitmq_messages_publish_errors_total[5m]) > 0
+```
+
+## 🔐 Segurança
+
+### Antes de ir para produção:
+
+- [ ] Trocar todas as senhas padrão
+- [ ] Configurar SSL/TLS para todos os serviços expostos
+- [ ] Implementar rate limiting
+- [ ] Configurar network policies
+- [ ] Usar secrets management (Vault, AWS Secrets Manager)
+- [ ] Implementar RBAC no Kubernetes
+- [ ] Configurar backups automáticos
+- [ ] Implementar disaster recovery
+- [ ] Auditar dependências com `go mod audit`
+- [ ] Scan de vulnerabilidades com Trivy/Snyk
+
+## 🚀 Próximos Passos
+
+### Fase 2: Serviço de IA
+- [ ] Consumer RabbitMQ para `transaction.created`
+- [ ] Integração com OpenAI/Anthropic
+- [ ] Categorização inteligente de transações
+- [ ] Publicação de `transaction.categorized`
+
+### Melhorias Arquiteturais
+- [ ] API Gateway (Kong, Traefik)
+- [ ] Service Mesh (Istio, Linkerd)
+- [ ] Circuit Breaker (resilience4j)
+- [ ] Rate Limiting distribuído
+- [ ] Caching strategies (Redis cache-aside)
+- [ ] Database sharding
+- [ ] Read replicas
+- [ ] CQRS pattern
+
+### DevOps
+- [ ] CI/CD pipeline (GitHub Actions, GitLab CI)
+- [ ] Kubernetes deployment
+- [ ] Helm charts
+- [ ] ArgoCD para GitOps
+- [ ] Integration tests
+- [ ] Load testing (k6, Gatling)
+- [ ] Chaos engineering (Chaos Mesh)
+
+## 📚 Tecnologias Utilizadas
+
+### Backend
+- **Go 1.21**: Linguagem principal
+- **Gin**: Framework HTTP
+- **GORM**: ORM (ou SQL puro)
+- **JWT**: Autenticação
+- **bcrypt**: Hash de senhas
+
+### Infraestrutura
+- **Docker & Docker Compose**: Containerização
+- **PostgreSQL 15**: Banco relacional
+- **Redis 7**: Cache e sessões
+- **RabbitMQ 3**: Message broker
+
+### Observabilidade
+- **Prometheus**: Métricas
+- **Grafana**: Visualização
+- **Jaeger**: Tracing distribuído
+- **Loki**: Agregação de logs
+- **Promtail**: Coleta de logs
+- **OpenTelemetry**: Instrumentação
+
+## 🤝 Contribuindo
+
+1. Fork o projeto
+2. Crie uma branch (`git checkout -b feature/nova-feature`)
+3. Commit suas mudanças (`git commit -am 'Adiciona nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
+
+## 👨‍💻 Autor
+
+Desenvolvido com ❤️ seguindo as melhores práticas de microsserviços e observabilidade.
 
 ---
 
-## 📊 Monitoramento
+## 🎯 Checklist de Setup
 
-### Logs
-```bash
-# Docker
-sudo docker-compose logs -f
-sudo docker-compose logs -f ai-service
+### Primeira vez:
+- [ ] Instalar Docker e Docker Compose
+- [ ] Clonar o repositório
+- [ ] Executar `make init`
+- [ ] Copiar `.env.example` para `.env`
+- [ ] Executar `make up`
+- [ ] Verificar com `make health`
+- [ ] Acessar Grafana e configurar dashboards
+- [ ] Testar com `./test-flow.sh`
 
-# Local
-tail -f services/auth-service/logs/*.log
+### Desenvolvimento diário:
+- [ ] `make dev` para iniciar com logs
+- [ ] Fazer mudanças no código
+- [ ] `make rebuild` se mudou Dockerfile
+- [ ] `make logs-SERVICE` para debugar
+- [ ] Verificar métricas no Grafana
+- [ ] Verificar traces no Jaeger
+- [ ] `make down` ao final do dia
+
+### Deploy:
+- [ ] Revisar todas as configurações de segurança
+- [ ] Trocar senhas e secrets
+- [ ] Configurar SSL/TLS
+- [ ] Setup de backups automáticos
+- [ ] Configurar monitoramento e alertas
+- [ ] Documentar runbooks
+- [ ] Configurar disaster recovery
+
+---
+
+**🎉 Pronto! Você tem uma arquitetura de microsserviços de produção rodando localmente!**
+
+Para mais detalhes, consulte [FASE1_README.md](FASE1_README.md) Configuração dos Serviços
+
+### PostgreSQL
+
+**Conexão:**
+- Host: `localhost`
+- Port: `5432`
+- Database: `app_database`
+- User: `admin`
+- Password: `admin123`
+
+**String de conexão:**
+```
+postgresql://admin:admin123@localhost:5432/app_database
 ```
 
-### Métricas
-```bash
-curl http://localhost:8001/metrics | grep auth_
-curl http://localhost:8002/metrics | grep transactions_
-curl http://localhost:8003 | grep transactions_
+### Redis
+
+**Conexão:**
+- Host: `localhost`
+- Port: `6379`
+- Password: `redis123`
+
+**String de conexão:**
+```
+redis://:redis123@localhost:6379
 ```
 
----
+### RabbitMQ
 
-## 🔧 Troubleshooting
+**Conexão:**
+- Host: `localhost`
+- Port AMQP: `5672`
+- Management UI: `15672`
+- User: `admin`
+- Password: `admin123`
 
-### Docker
-```bash
-# Ver status
-sudo docker-compose ps
-
-# Reiniciar serviço
-sudo docker-compose restart ai-service
-
-# Reconstruir
-sudo docker-compose build --no-cache
-
-# Limpar tudo
-sudo docker-compose down -v
+**String de conexão:**
+```
+amqp://admin:admin123@localhost:5672/
 ```
 
-### Local
-```bash
-# Ver portas em uso
-sudo lsof -i :8001
+## 📊 Configurando Observabilidade
 
-# Matar processo
-pkill -f auth-service
+### 1. Métricas com Prometheus
 
-# Reiniciar infraestrutura
-sudo docker-compose restart postgres redis rabbitmq
+Os targets já estão configurados em `config/prometheus/prometheus.yml`. Para adicionar novos serviços:
+
+```yaml
+- job_name: 'seu-servico'
+  static_configs:
+    - targets: ['seu-servico:porta']
+      labels:
+        service: 'seu-servico'
 ```
 
----
+### 2. Dashboards no Grafana
 
-## 📈 Próximos Passos
-
-1. **Frontend React** com dashboard
-2. **Testes automatizados** (unitários e integração)
-3. **CI/CD** com GitHub Actions
-4. **Deploy Kubernetes**
-5. **Melhorias no modelo ML**
-6. **Notificações** (email, push)
-7. **Relatórios PDF**
-8. **API Gateway**
-
----
-
-## 🎉 Status
-
-- ✅ **3 Microsserviços** funcionando
-- ✅ **IA categorizando** automaticamente
-- ✅ **100% containerizado**
-- ✅ **Observabilidade completa**
-- ✅ **Testes automatizados**
-- ✅ **Documentação completa**
-
-**Projeto 100% funcional e pronto para produção!** 🚀
-
----
-
-## 📞 Suporte
-
-- Ver logs: `./logs-docker.sh`
-- Health checks: `curl http://localhost:800{1,2,3}/health`
-- Documentação: Veja os arquivos `.md` na raiz
-
----
-
-**Versão:** 1.0.0  
-**Última atualização:** 2025-10-18  
-**Desenvolvido com:** Go, Python, Docker, ML
+1. Acesse http://localhost:3000
+2. Login: admin / admin123
+3. Os datasources já estão configurados automaticamente
+4. Importe dashboards prontos:
+   - PostgreSQL: Dashboard ID `9628`
+   - Redis: Dashboard ID `11835`
+   - RabbitMQ:

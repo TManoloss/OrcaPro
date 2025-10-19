@@ -50,6 +50,14 @@ scrape_configs:
 
   # Seus microsserviços vão aqui
   # Exemplo de como adicionar seus serviços:
+  - job_name: 'api-gateway'
+    static_configs:
+      - targets: ['api-gateway:8000']
+        labels:
+          service: 'api-gateway'
+          tier: 'gateway'
+    scrape_interval: 15s
+
   - job_name: 'auth-service'
     static_configs:
       - targets: ['auth-service:8001']
@@ -72,6 +80,14 @@ scrape_configs:
         labels:
           service: 'ai-service'
           tier: 'ml'
+    scrape_interval: 15s
+
+  - job_name: 'notification-service'
+    static_configs:
+      - targets: ['notification-service:8004']
+        labels:
+          service: 'notification-service'
+          tier: 'backend'
     scrape_interval: 15s
 
   # Docker metrics (requer cAdvisor)
